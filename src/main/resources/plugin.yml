@@ -1,0 +1,4 @@
+name: Moon
+version: @version@
+main: me.mattstudios.moon.Moon
+api-version: 1.13

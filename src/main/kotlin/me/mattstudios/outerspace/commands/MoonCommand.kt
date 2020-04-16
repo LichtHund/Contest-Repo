@@ -17,12 +17,12 @@ class MoonCommand : CommandBase() {
 
     @Default
     fun default(player: Player) {
-        player.teleport(Location(Bukkit.getWorld("moon"), 50.0, 50.0, 50.0))
+        player.teleport(Location(Bukkit.getWorld("ar452b"), 50.0, 50.0, 50.0))
     }
 
     @SubCommand("delete")
     fun delete(player: CommandSender) {
-        val world = Bukkit.getWorld("moon") ?: return
+        val world = Bukkit.getWorld("ar452b") ?: return
         Bukkit.unloadWorld(world, true)
         world.worldFolder.deleteRecursively()
     }

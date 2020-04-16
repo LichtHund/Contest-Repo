@@ -1,4 +1,4 @@
-name: Moon
+name: OuterWorld
 version: @version@
-main: me.mattstudios.moon.Moon
+main: me.mattstudios.outerspace.OuterWorld
 api-version: 1.13

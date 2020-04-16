@@ -1,8 +1,8 @@
-package me.mattstudios.moon
+package me.mattstudios.outerspace
 
 import me.mattstudios.mattcore.MattPlugin
-import me.mattstudios.moon.commands.MoonCommand
-import me.mattstudios.moon.generator.PlanetChunkGenerator
+import me.mattstudios.outerspace.commands.MoonCommand
+import me.mattstudios.outerspace.generator.PlanetChunkGenerator
 import org.bukkit.GameRule
 import org.bukkit.WorldCreator
 import org.bukkit.event.Listener
@@ -14,7 +14,7 @@ import org.bukkit.event.Listener
 class OuterWorld : MattPlugin(), Listener {
 
     override fun enable() {
-        val worldCreator = WorldCreator("moon")
+        val worldCreator = WorldCreator("ar452b")
         worldCreator.generator(PlanetChunkGenerator(worldCreator.seed()))
         worldCreator.createWorld()
 

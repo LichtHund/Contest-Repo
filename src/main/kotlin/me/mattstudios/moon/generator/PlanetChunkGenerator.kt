@@ -1,7 +1,9 @@
 package me.mattstudios.moon.generator
 
+import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
+import org.bukkit.block.Biome
 import org.bukkit.generator.BlockPopulator
 import org.bukkit.generator.ChunkGenerator
 import org.bukkit.util.noise.PerlinOctaveGenerator
@@ -64,13 +66,13 @@ class MoonChunkGenerator : ChunkGenerator() {
                 for (y in topHeight..world.maxHeight) {
                     when (y) {
                         // Top stone layer
-                        in (248..254).random()..world.maxHeight -> setBlock(chunk, x, y, z, Material.STONE)
+                        in (248..254).random()..world.maxHeight -> setBlock(chunk, x, y, z, Material.STONE, biome, Biome.STONE_SHORE)
 
                         // Lower packed ice layer
-                        in y..(topHeight + 45) -> setBlock(chunk, x, y, z, Material.PACKED_ICE)
+                        in y..(topHeight + 45) -> setBlock(chunk, x, y, z, Material.PACKED_ICE, biome, Biome.FROZEN_OCEAN)
 
                         // Middle blue ice layer
-                        else -> setBlock(chunk, x, y, z, Material.BLUE_ICE)
+                        else -> setBlock(chunk, x, y, z, Material.BLUE_ICE, biome, Biome.DEEP_FROZEN_OCEAN)
                     }
                 }
 
@@ -85,20 +87,21 @@ class MoonChunkGenerator : ChunkGenerator() {
 
                 // Checks if the height is less than sea level
                 if (maxHeight < seaLevel) {
-                    for (y in maxHeight..62) setBlock(chunk, x, y, z, Material.WATER)
+                    for (y in maxHeight..62) setBlock(chunk, x, y, z, Material.WATER, biome, Biome.WARM_OCEAN)
 
                     // underwater sand blocks
-                    setBlock(chunk, x, maxHeight - 1, z, Material.SAND)
-                    setBlock(chunk, x, maxHeight - 2, z, Material.SAND)
-                    if (Math.random() > 0.5) setBlock(chunk, x, maxHeight - 3, z, Material.SAND)
+                    setBlock(chunk, x, maxHeight - 1, z, Material.SAND, biome, Biome.WARM_OCEAN)
+                    setBlock(chunk, x, maxHeight - 2, z, Material.SAND, biome, Biome.WARM_OCEAN)
+                    if (Math.random() > 0.5) setBlock(chunk, x, maxHeight - 3, z, Material.SAND, biome, Biome.WARM_OCEAN)
 
-                } else {
-
-                    // surface grass blocks
-                    setBlock(chunk, x, maxHeight, z, Material.GRASS_BLOCK)
-                    //setBlock(chunk, x, maxHeight - 1, z, Material.DIRT)
-                    //if (Math.random() > 0.5) setBlock(chunk, x, maxHeight - 2, z, Material.DIRT)
+                    continue
                 }
+
+                // surface grass blocks
+                setBlock(chunk, x, maxHeight, z, Material.GRASS_BLOCK)
+                //setBlock(chunk, x, maxHeight - 1, z, Material.DIRT)
+                //if (Math.random() > 0.5) setBlock(chunk, x, maxHeight - 2, z, Material.DIRT)
+
 
                 //biome.setBiome(x, z, Biome.PLAINS)
             }
@@ -116,12 +119,20 @@ class MoonChunkGenerator : ChunkGenerator() {
         return chunk
     }
 
-    private fun setBlock(chunk: ChunkData, x: Int, y: Int, z: Int, material: Material) {
+    private fun setBlock(chunk: ChunkData, x: Int, y: Int, z: Int, material: Material, biomeData: BiomeGrid? = null, biome: Biome? = null) {
+        if (biome != null && biomeData != null) biomeData.setBiome(x, y, z, biome)
         chunk.setBlock(x, y, z, material)
     }
 
     override fun getDefaultPopulators(world: World): MutableList<BlockPopulator> {
         return ArrayList()
+    }
+
+    override fun getFixedSpawnLocation(world: World, random: Random): Location {
+        val x = random.nextInt(200) - 100
+        val z = random.nextInt(200) - 100
+        val y = world.getHighestBlockYAt(x, z)
+        return Location(world, x.toDouble(), y.toDouble(), z.toDouble())
     }
 
 

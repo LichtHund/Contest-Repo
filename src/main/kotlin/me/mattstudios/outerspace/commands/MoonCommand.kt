@@ -1,4 +1,4 @@
-package me.mattstudios.moon.commands
+package me.mattstudios.outerspace.commands
 
 import me.mattstudios.mf.annotations.Command
 import me.mattstudios.mf.annotations.Default

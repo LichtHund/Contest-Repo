@@ -1,6 +1,6 @@
-package me.mattstudios.moon.generator
+package me.mattstudios.outerspace.generator
 
-import me.mattstudios.moon.generator.populators.SurfaceCratersPopulator
+import me.mattstudios.outerspace.generator.populators.SurfaceCratersPopulator
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World

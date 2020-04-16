@@ -1,4 +1,4 @@
-package me.mattstudios.moon.generator.populators
+package me.mattstudios.outerspace.generator.populators
 
 import org.bukkit.Chunk
 import org.bukkit.Location

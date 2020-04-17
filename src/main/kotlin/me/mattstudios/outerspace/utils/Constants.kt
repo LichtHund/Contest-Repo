@@ -10,6 +10,4 @@ object Constants {
     // Url for the OuterWorld resource pack
     const val OW_RESOURCE_PACK_URL = "https://www.dropbox.com/s/kzqr1686nv6ejeh/OuterWorld.zip?dl=1"
 
-    // Chance for meteor shower
-    const val METEOR_CHANCE = 80
 }

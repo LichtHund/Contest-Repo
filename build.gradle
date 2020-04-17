@@ -28,7 +28,7 @@ allprojects {
 
         // My stuff
         implementation "me.mattstudios.utils:matt-framework:1.4"
-        implementation "me.mattstudios.utils:matt-core:1.1.12"
+        implementation "com.github.ipsk:MattCore:311ecf26e1"
 
         // Config repository
         implementation("com.github.ipsk:ConfigMe:8ccab345e9") {
@@ -65,6 +65,7 @@ shadowJar {
     relocate("me.mattstudios.mf", "me.mattstudios.outerspace.mf")
     relocate("me.mattstudios.mattcore", "me.mattstudios.outerspace.core")
     relocate("ch.jalu.configme", "me.mattstudios.outerspace.configme")
+    relocate("kotlin", "me.mattstudios.outerspace.kotlin")
 
     archiveFileName = "OuterWorld-${project.version}.jar"
 

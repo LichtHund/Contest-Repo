@@ -3,6 +3,7 @@ package me.mattstudios.outerspace
 import me.mattstudios.mattcore.MattPlugin
 import me.mattstudios.mattcore.utils.MessageUtils.info
 import me.mattstudios.outerspace.commands.AbductionCommand
+import me.mattstudios.outerspace.config.Settings
 import me.mattstudios.outerspace.generator.PlanetChunkGenerator
 import me.mattstudios.outerspace.listeners.PlayerListeners
 import me.mattstudios.outerspace.schedulers.MeteorScheduler
@@ -23,6 +24,8 @@ class OuterWorld : MattPlugin() {
      */
     override fun enable() {
         createWorld()
+
+        config.load(Settings.javaClass)
 
         // Registers handlers
         registerCommands(AbductionCommand())

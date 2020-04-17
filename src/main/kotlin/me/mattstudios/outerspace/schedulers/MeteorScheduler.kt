@@ -1,6 +1,7 @@
 package me.mattstudios.outerspace.schedulers
 
 import me.mattstudios.outerspace.OuterWorld
+import me.mattstudios.outerspace.config.Settings
 import me.mattstudios.outerspace.schedulers.components.MeteorShower
 import me.mattstudios.outerspace.utils.Constants
 import org.bukkit.Bukkit
@@ -13,7 +14,7 @@ class MeteorScheduler(private val plugin: OuterWorld) : Runnable {
 
     override fun run() {
         // Checks if should or not shower
-        if ((1..100).random() >= Constants.METEOR_CHANCE) return
+        if ((1..100).random() >= plugin.config[Settings.METEOR_CHANCE]) return
 
         // Gets a random player in the planet or returns if there is none
         val planetPlayers = Bukkit.getOnlinePlayers().filter { it.world.name == Constants.WORLD_NAME }

@@ -1,6 +1,7 @@
 package me.mattstudios.outerspace.generator
 
 import me.mattstudios.outerspace.generator.populators.SurfaceCratersPopulator
+import me.mattstudios.outerspace.generator.populators.WitherRosePopulator
 import org.bukkit.Location
 import org.bukkit.Material
 import org.bukkit.World
@@ -15,7 +16,7 @@ import kotlin.math.pow
 /**
  * @author Matt
  */
-class PlanetChunkGenerator(seed: Long) : ChunkGenerator() {
+class PlanetChunkGenerator() : ChunkGenerator() {
 
     // Controls basic settings
     private val seaLevel = 62
@@ -25,18 +26,6 @@ class PlanetChunkGenerator(seed: Long) : ChunkGenerator() {
     private var lacunarity = 2.0
     private var persistence = 0.5
 
-    // Creates the perlin octave generators used
-    private val elevationPerlin = PerlinOctaveGenerator(seed, 4)
-    private val detailPerlin = PerlinOctaveGenerator(seed, 4)
-    private val roughPerlin = PerlinOctaveGenerator(seed, 1)
-
-    init {
-        // Sets all the generator's scale
-        elevationPerlin.setScale(1 / 800.0)
-        detailPerlin.setScale(1 / 50.0)
-        roughPerlin.setScale(1 / 200.0)
-    }
-
     /**
      * Generates the planet chunks
      *
@@ -45,83 +34,90 @@ class PlanetChunkGenerator(seed: Long) : ChunkGenerator() {
      */
     @Suppress("DEPRECATION")
     override fun generateChunkData(world: World, random: Random, chunkX: Int, chunkZ: Int, biomeGrid: BiomeGrid): ChunkData {
+        // Creates the perlin octave generators used
+        val elevationPerlin = PerlinOctaveGenerator(world.seed, 4)
+        val detailPerlin = PerlinOctaveGenerator(world.seed, 4)
+        val roughPerlin = PerlinOctaveGenerator(world.seed, 1)
+
+        // Sets all the generator's scale
+        elevationPerlin.setScale(1 / 800.0)
+        detailPerlin.setScale(1 / 50.0)
+        roughPerlin.setScale(1 / 200.0)
+
         val chunk = createChunkData(world)
 
         // Cycles through the chunk coordinates
-        for (x in 0..15) {
-            for (z in 0..15) {
-                val biome = biomeGrid.getBiome(x, z)
+        for (x in 0..15) for (z in 0..15) {
+            val biome = biomeGrid.getBiome(x, z)
 
-                // Gets the value of the real coordinates from the chunk
-                val realX = x + chunkX * 16
-                val realZ = z + chunkZ * 16
+            // Gets the value of the real coordinates from the chunk
+            val realX = x + chunkX * 16
+            val realZ = z + chunkZ * 16
 
-                // Gets the noise values for each perlin
-                val elevationNoise = elevationPerlin.noise(realX.toDouble(), realZ.toDouble(), lacunarity.pow(0), persistence.pow(0), false)
-                val detailNoise = detailPerlin.noise(realX.toDouble(), realZ.toDouble(), lacunarity.pow(1), persistence.pow(1), false)
-                val roughNoise = roughPerlin.noise(realX.toDouble(), realZ.toDouble(), lacunarity.pow(2), persistence.pow(2), false)
+            // Gets the noise values for each perlin
+            val elevationNoise = elevationPerlin.noise(realX.toDouble(), realZ.toDouble(), lacunarity.pow(0), persistence.pow(0), false)
+            val detailNoise = detailPerlin.noise(realX.toDouble(), realZ.toDouble(), lacunarity.pow(1), persistence.pow(1), false)
+            val roughNoise = roughPerlin.noise(realX.toDouble(), realZ.toDouble(), lacunarity.pow(2), persistence.pow(2), false)
 
-                // Gets the max height of the noise
-                var maxHeight = ((elevationNoise + detailNoise * roughNoise) * seaLevel + medianLevel).toInt()
+            // Gets the max height of the noise
+            var maxHeight = ((elevationNoise + detailNoise * roughNoise) * seaLevel + medianLevel).toInt()
 
-                // Makes sure the max height will never be higher than the top layer
-                if (maxHeight >= world.maxHeight) maxHeight = world.maxHeight
+            // Makes sure the max height will never be higher than the top layer
+            if (maxHeight >= world.maxHeight) maxHeight = world.maxHeight
 
-                // Gets a random
-                val bedrockMax = (1..5).random()
+            // Gets a random
+            val bedrockMax = (1..5).random()
 
-                // Sets the bedrock layer
-                for (y in 0..bedrockMax) setBlock(chunk, x, y, z, Material.BEDROCK)
+            // Sets the bedrock layer
+            for (y in 0..bedrockMax) setBlock(chunk, x, y, z, Material.BEDROCK)
 
-                // Fills the rest of the height with stone
-                for (y in bedrockMax..maxHeight) setBlock(chunk, x, y, z, Material.STONE)
+            // Fills the rest of the height with stone
+            for (y in bedrockMax..maxHeight) setBlock(chunk, x, y, z, Material.STONE)
 
-                // Checks if the height is less than sea level
-                if (maxHeight < seaLevel) {
-                    // Makes sure that the ocean floor doesn't get lower than 5 to prevent bedrock from being deleted
-                    if (maxHeight < 5) maxHeight += 5
+            // Checks if the height is less than sea level
+            if (maxHeight < seaLevel) {
+                // Makes sure that the ocean floor doesn't get lower than 5 to prevent bedrock from being deleted
+                if (maxHeight < 5) maxHeight = 5
 
-                    // Makes all ocean warm ocean due to the planet's temperature
-                    biomeGrid.setBiome(x, z, Biome.WARM_OCEAN)
+                // Makes all ocean warm ocean due to the planet's temperature
+                biomeGrid.setBiome(x, z, Biome.WARM_OCEAN)
 
-                    // Fills the ocean
-                    for (y in maxHeight..seaLevel) setBlock(chunk, x, y, z, Material.WATER)
+                // Fills the ocean
+                for (y in maxHeight..seaLevel) setBlock(chunk, x, y, z, Material.WATER)
 
-                    // Random chance to populate the ocean floor with gravel
-                    if ((1..100).random() <= 20) {
-                        populateOceanFloor(chunk, x, maxHeight, z, Material.GRAVEL)
-                        continue
-                    }
-
-                    // Populates the rest of the ocean floor with sand
-                    populateOceanFloor(chunk, x, maxHeight, z, Material.SAND)
-
+                // Random chance to populate the ocean floor with gravel
+                if ((1..100).random() <= 20) {
+                    populateOceanFloor(chunk, x, maxHeight, z, Material.GRAVEL)
                     continue
                 }
 
-                // Biome changing conditions
-                when (biome) {
-                    Biome.FOREST -> if (maxHeight >= 100) biomeGrid.setBiome(x, z, Biome.WOODED_HILLS)
-                    Biome.WOODED_HILLS -> if (maxHeight < 100) biomeGrid.setBiome(x, z, Biome.FOREST)
+                // Populates the rest of the ocean floor with sand
+                populateOceanFloor(chunk, x, maxHeight, z, Material.SAND)
 
-                    Biome.DARK_FOREST -> if (maxHeight >= 100) biomeGrid.setBiome(x, z, Biome.DARK_FOREST_HILLS)
-                    Biome.DARK_FOREST_HILLS -> if (maxHeight < 100) biomeGrid.setBiome(x, z, Biome.DARK_FOREST)
-
-                    Biome.PLAINS -> if (maxHeight >= 100) biomeGrid.setBiome(x, z, Biome.WOODED_HILLS)
-
-                    else -> {
-                        if (maxHeight > 100) biomeGrid.setBiome(x, z, Biome.BAMBOO_JUNGLE_HILLS)
-                        else biomeGrid.setBiome(x, z, Biome.BAMBOO_JUNGLE)
-                    }
-                }
-
-                // surface grass blocks
-                setBlock(chunk, x, maxHeight, z, Material.GRASS_BLOCK)
-                setBlock(chunk, x, maxHeight - 1, z, Material.DIRT)
-
-                if ((0..1).random() == 0) setBlock(chunk, x, maxHeight - 2, z, Material.DIRT)
-
+                continue
             }
+
+            // Biome changing conditions
+            when (biome) {
+                Biome.FOREST -> if (maxHeight >= 100) biomeGrid.setBiome(x, z, Biome.WOODED_HILLS)
+                Biome.WOODED_HILLS -> if (maxHeight < 100) biomeGrid.setBiome(x, z, Biome.FOREST)
+
+                Biome.DARK_FOREST -> if (maxHeight >= 100) biomeGrid.setBiome(x, z, Biome.DARK_FOREST_HILLS)
+                Biome.DARK_FOREST_HILLS -> if (maxHeight < 100) biomeGrid.setBiome(x, z, Biome.DARK_FOREST)
+
+                Biome.PLAINS -> if (maxHeight >= 100) biomeGrid.setBiome(x, z, Biome.WOODED_HILLS)
+
+                else -> {
+                    if (maxHeight > 100) biomeGrid.setBiome(x, z, Biome.BAMBOO_JUNGLE_HILLS)
+                    else biomeGrid.setBiome(x, z, Biome.BAMBOO_JUNGLE)
+                }
+            }
+
+            // surface grass blocks
+            setBlock(chunk, x, maxHeight, z, Material.GRASS_BLOCK)
+            setBlock(chunk, x, maxHeight - 1, z, Material.DIRT)
+
+            if ((0..1).random() == 0) setBlock(chunk, x, maxHeight - 2, z, Material.DIRT)
 
         }
 
@@ -132,7 +128,7 @@ class PlanetChunkGenerator(seed: Long) : ChunkGenerator() {
      * Lets it generate vanilla caves
      */
     override fun shouldGenerateCaves(): Boolean {
-        return false
+        return true
     }
 
     /**
@@ -146,7 +142,7 @@ class PlanetChunkGenerator(seed: Long) : ChunkGenerator() {
      * Sets the populators for the world
      */
     override fun getDefaultPopulators(world: World): List<BlockPopulator> {
-        return listOf(SurfaceCratersPopulator())
+        return listOf(SurfaceCratersPopulator(), WitherRosePopulator())
     }
 
     /**

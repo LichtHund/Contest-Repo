@@ -28,7 +28,7 @@ class OuterWorld : MattPlugin() {
         config.load(Settings.javaClass)
 
         // Registers handlers
-        registerCommands(AbductionCommand())
+        registerCommands(AbductionCommand(this))
         registerListeners(PlayerListeners())
 
         // Starts events, meteor shower and toxic rain

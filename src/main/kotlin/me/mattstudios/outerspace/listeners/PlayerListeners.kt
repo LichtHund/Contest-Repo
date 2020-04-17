@@ -23,6 +23,8 @@ class PlayerListeners : Listener {
             return
         }
 
+        if (player.world.name != Constants.WORLD_NAME) return
+
         // Sets the OuterWorld texture pack when the player joins the world
         player.setResourcePack(Constants.OW_RESOURCE_PACK_URL)
     }

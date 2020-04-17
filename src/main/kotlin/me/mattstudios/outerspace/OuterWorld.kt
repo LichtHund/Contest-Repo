@@ -2,10 +2,11 @@ package me.mattstudios.outerspace
 
 import me.mattstudios.mattcore.MattPlugin
 import me.mattstudios.mattcore.utils.MessageUtils.info
-import me.mattstudios.outerspace.commands.MoonCommand
+import me.mattstudios.outerspace.commands.AbductionCommand
 import me.mattstudios.outerspace.generator.PlanetChunkGenerator
 import me.mattstudios.outerspace.listeners.PlayerListeners
 import me.mattstudios.outerspace.schedulers.MeteorScheduler
+import me.mattstudios.outerspace.schedulers.RainScheduler
 import me.mattstudios.outerspace.utils.Constants
 import org.bukkit.Bukkit
 import org.bukkit.Difficulty
@@ -23,10 +24,15 @@ class OuterWorld : MattPlugin() {
     override fun enable() {
         createWorld()
 
-        registerCommands(MoonCommand())
+        // Registers handlers
+        registerCommands(AbductionCommand())
         registerListeners(PlayerListeners())
 
-        Bukkit.getScheduler().runTaskTimer(this, MeteorScheduler(this), 20L, 600L)
+        // Starts events, meteor shower and toxic rain
+        // Runs every 5 minutes
+        Bukkit.getScheduler().runTaskTimer(this, MeteorScheduler(this), 6000L, 6000L)
+        // Runs every 5 ticks
+        Bukkit.getScheduler().runTaskTimer(this, RainScheduler(), 5L, 5L)
     }
 
     /**

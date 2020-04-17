@@ -139,6 +139,13 @@ class PlanetChunkGenerator() : ChunkGenerator() {
     }
 
     /**
+     * Lets the default mobs spawn
+     */
+    override fun shouldGenerateMobs(): Boolean {
+        return true
+    }
+
+    /**
      * Sets the populators for the world
      */
     override fun getDefaultPopulators(world: World): List<BlockPopulator> {

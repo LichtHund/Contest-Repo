@@ -1,5 +1,5 @@
 ### Plugin made for MisterMel's contest
-Since time was limited I couldn't implement the abduction to take your to the planet, so do `/abduct <player>` to go to the world.
+Since time was limited I couldn't implement the abduction to take you to the planet, so do `/abduct <player>` to go to the world.
 ## Features
 * Custom planet generation with 4 biomes to create an alien look
 * Meteor showers that have a 20% chance of happening every 5 minutes in the planet
